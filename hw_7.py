@@ -82,11 +82,17 @@ class Record:
     
     @input_error
     def add_contact(args, address_book):
-        name, phone = args
-        record = Record(name)
-        record.add_phone(phone)
-        address_book.add_record(record)
-        return "Contact added."
+        name, phone, *_ = args
+        address_book = AddressBook
+        record = address_book.find(name)
+        message = "Contact updated."
+        if record is None:
+            record = Record(name)
+            address_book.add_record(record)
+            message = "Contact added."
+        if phone:
+            record.add_phone(phone)
+        return message
     
     @input_error
     def change_contact(args, address_book):
@@ -112,6 +118,9 @@ class Record:
         for record in address_book.values():
             print(record)
 
+    def add_birthday(self, birthday):
+        self.birthday = Birthday(birthday)
+
     def main():
         address_book = AddressBook()
         print("Welcome to the assistant bot!")
@@ -131,9 +140,21 @@ class Record:
             elif command == "show":
                 print(Record.show_contact(args, address_book))   
             elif command == "all": 
-                Record.all_contacts(address_book)             
+                Record.all_contacts(address_book)
+            elif command == "add-birthday":
+                print(Record.add_birthday(address_book))
+            elif command == "show-birthday":
+                #TODO:show-birthday
+                pass 
+                # print(Record.add_birthday(address_book))
+            elif command == "birthdays":
+                pass 
+                #TODO:birthdays  
             else:
                 print("Invalid command.")
+
+    if __name__ == "__main__":
+        main()
             
 
     def __str__(self):
@@ -150,3 +171,11 @@ class AddressBook(UserDict):
     def delete(self, name):
         if name in self.data:
             del self.data[name]
+
+    def find_next_weekday(d, weekday: int):  # Функція для знаходження наступного заданого дня тижня після заданої дати
+        days_ahead = weekday - d.weekday()
+        if days_ahead <= 0: 
+            days_ahead = days_ahead + 7 
+        return d + timedelta(days=days_ahead)
+    
+
