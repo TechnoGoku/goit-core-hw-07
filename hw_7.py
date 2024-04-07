@@ -1,4 +1,5 @@
 from collections import UserDict
+from datetime import datetime, timedelta
 
 
 class Field:
@@ -23,12 +24,22 @@ class Phone(Field):
     
     def __str__(self):
         return f'+38{self.value}'
+    
+
+class Birthday(Field):
+    def __init__(self, value):
+        try:
+            self.date = datetime.strptime(value, "@d.%m.%Y").date()
+            super.__init__(value)
+        except ValueError:
+            raise ValueError("Invalid date format. Use DD.MM.YYYY") 
 
 
 class Record:
     def __init__(self, name):
         self.name = Name(name)
         self.phones = []
+        self.birthday = None
 
     def add_phone(self, phone_number):
         self.phones.append(Phone(phone_number))
