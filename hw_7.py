@@ -17,10 +17,20 @@ class Name(Field):
 
 class Phone(Field):
     def __init__(self, value):
-        if len(value) == 10 and value.isdigit():
-            super().__init__(value)
-        else:
-            raise ValueError('Value error')
+        super().__init__(value)  # TODO: check
+        self.__value = None
+        self.value = value
+        
+        @property
+        def value(self):
+            return self.__value
+        
+        @value.setter
+        def value(self, value):
+            if len(value) == 10 and value.isdigit():
+                self.__value = value
+            else:
+                raise ValueError('Invalid phone number')
     
     def __str__(self):
         return f'+38{self.value}'
