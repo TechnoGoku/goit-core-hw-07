@@ -40,7 +40,7 @@ class Birthday(Field):
     def __init__(self, value):
         try:
             self.date = datetime.strptime(value, "@d.%m.%Y").date()
-            super.__init__(value)
+            super().__init__(value)
         except ValueError:
             raise ValueError("Invalid date format. Use DD.MM.YYYY") 
 
@@ -121,6 +121,14 @@ class Record:
     def add_birthday(self, birthday):
         self.birthday = Birthday(birthday)
 
+    #TODO: show_birthday - Показати дату народження для вказаного контакту.
+    def show_birthday(self):
+        pass
+
+    #TODO: bitrhdays - Показати дні народження, які відбудуться протягом наступного тижня.
+    def birthdays(self):
+        pass  
+
     def main():
         address_book = AddressBook()
         print("Welcome to the assistant bot!")
@@ -149,7 +157,6 @@ class Record:
                 # print(Record.add_birthday(address_book))
             elif command == "birthdays":
                 pass 
-                #TODO:birthdays  
             else:
                 print("Invalid command.")
 
