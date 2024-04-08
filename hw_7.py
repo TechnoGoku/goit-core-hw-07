@@ -83,7 +83,6 @@ class Record:
     @input_error
     def add_contact(args, address_book):
         name, phone, *_ = args
-        address_book = AddressBook
         record = address_book.find(name)
         message = "Contact updated."
         if record is None:
@@ -113,24 +112,38 @@ class Record:
             return record
         else:
             raise KeyError("Contact not found.")
-        
+
+    @input_error    
     def all_contacts(address_book):
         for record in address_book.values():
             print(record)
 
+    @input_error
     def add_birthday(self, birthday):
         self.birthday = Birthday(birthday)
 
-    #TODO: show_birthday - Показати дату народження для вказаного контакту.
+    @input_error
     def show_birthday(self):
-        pass
+        if self.birthday:
+            return f"{self.name}'s birthday is on {self.birthday}"
+        else:
+            return f"{self.name} does not have a birthday set."
 
-    #TODO: bitrhdays - Показати дні народження, які відбудуться протягом наступного тижня.
-    def birthdays(self):
-        pass  
+    def birthdays(self, address_book):
+        today = datetime.now().date()
+        next_week = today + timedelta(days=7)
+        birthdays_next_week = []
+        for record in address_book.values():
+            if record.birthday and today <= record.birthday.date <= next_week:
+                birthdays_next_week.append((record.name, record.birthday.date))
+        if birthdays_next_week:
+            return "\n".join([f"{name}'s birthday on {date}" for name, date in birthdays_next_week])
+        else:
+            return "No birthdays in the next week."
+    
 
     def main():
-        address_book = AddressBook()
+        address_book = AddressBook(UserDict)
         print("Welcome to the assistant bot!")
         while True:
             user_input = input("Enter a command: ")
@@ -159,13 +172,15 @@ class Record:
                 pass 
             else:
                 print("Invalid command.")
-
+    
     if __name__ == "__main__":
         main()
             
 
     def __str__(self):
         return f"Contact name: {self.name.value}, phones: {'; '.join(str(p) for p in self.phones)}"
+    
+   
 
 
 class AddressBook(UserDict):
@@ -184,5 +199,7 @@ class AddressBook(UserDict):
         if days_ahead <= 0: 
             days_ahead = days_ahead + 7 
         return d + timedelta(days=days_ahead)
+    
+    
     
 
