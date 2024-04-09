@@ -17,7 +17,7 @@ class Name(Field):
 
 class Phone(Field):
     def __init__(self, value):
-        super().__init__(value)  # TODO: check
+        super().__init__(value)  
         self.__value = None
         self.value = value
         
@@ -39,7 +39,7 @@ class Phone(Field):
 class Birthday(Field):
     def __init__(self, value):
         try:
-            self.date = datetime.strptime(value, "@d.%m.%Y").date()
+            self.date = datetime.strptime(value, "%d.%m.%Y").date()
             super().__init__(value)
         except ValueError:
             raise ValueError("Invalid date format. Use DD.MM.YYYY") 
@@ -143,7 +143,7 @@ class Record:
     
 
     def main():
-        address_book = AddressBook(UserDict)
+        address_book = AddressBook()
         print("Welcome to the assistant bot!")
         while True:
             user_input = input("Enter a command: ")
@@ -163,13 +163,11 @@ class Record:
             elif command == "all": 
                 Record.all_contacts(address_book)
             elif command == "add-birthday":
-                print(Record.add_birthday(address_book))
+                print(Record.add_birthday(args, address_book))
             elif command == "show-birthday":
-                #TODO:show-birthday
-                pass 
-                # print(Record.add_birthday(address_book))
+                print(Record.show_birthday(args, address_book))
             elif command == "birthdays":
-                pass 
+                print(Record.birthdays(args, address_book))
             else:
                 print("Invalid command.")
     
@@ -199,6 +197,41 @@ class AddressBook(UserDict):
         if days_ahead <= 0: 
             days_ahead = days_ahead + 7 
         return d + timedelta(days=days_ahead)
+    
+    def parse_birthdays(users):
+        prepared_users = []  # Список підготовлених користувачів
+        for user in users:  # Ітерація по кожному користувачеві зі списку
+            try:
+                birthday = datetime.strptime(user['birthday'], '%Y.%m.%d').date()  # Парсимо дату народження
+                prepared_users.append({"name": user['name'], 'birthday': birthday})  # Додаємо користувача з підготовленою датою народження
+            except ValueError:
+                print(f'Некоректна дата народження для користувача {user["name"]}')  # Виводимо повідомлення про помилку
+        return prepared_users
+    
+    def get_upcoming_birthday(users):
+        days = 7  # Кількість днів для перевірки на наближені дні народження
+        today = datetime.today().date()  # Поточна дата
+        prepared_users = parse_birthdays(users)
+        upcoming_birthdays = []
+
+        for user in prepared_users:  # Ітерація по підготовленим користувачам
+            birthday_this_year = user["birthday"].replace(year=today.year)  # Заміна року на поточний для дня народження цього року
+
+            if birthday_this_year < today:  # Якщо дата народження вже пройшла цього року
+                birthday_this_year = birthday_this_year.replace(year=today.year + 1)  # Переносимо наступний рік
+
+            if 0 <= (birthday_this_year - today).days <= days:  # Якщо день народження в межах вказаного періоду
+                if birthday_this_year.weekday() >= 5:  # Якщо день народження випадає на суботу або неділю
+                    birthday_this_year = find_next_weekday(birthday_this_year, 0)  # Знаходимо наступний понеділок
+
+                congratulation_date_str = birthday_this_year.strftime('%Y.%m.%d')  # Форматуємо дату у рядок
+                upcoming_birthdays.append({  # Додаємо дані про майбутній день народження
+                    "name": user["name"],
+                    "congratulation_date": congratulation_date_str
+            })
+    
+        return upcoming_birthdays
+    
     
     
     
