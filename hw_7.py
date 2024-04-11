@@ -11,8 +11,7 @@ class Field:
 
 
 class Name(Field):
-    def __init__(self, value):
-        super().__init__(value)
+    pass
 
 
 class Phone(Field):
@@ -55,12 +54,14 @@ class AddressBook(UserDict):
         if name in self.data:
             del self.data[name]
 
+    @staticmethod
     def find_next_weekday(d, weekday: int):  # Функція для знаходження наступного заданого дня тижня після заданої дати
         days_ahead = weekday - d.weekday()
         if days_ahead <= 0: 
             days_ahead = days_ahead + 7 
         return d + timedelta(days=days_ahead)
     
+    @staticmethod
     def parse_birthdays(users):
         prepared_users = []  # Список підготовлених користувачів
         for user in users:  # Ітерація по кожному користувачеві зі списку
@@ -71,10 +72,11 @@ class AddressBook(UserDict):
                 print(f'Некоректна дата народження для користувача {user["name"]}')  # Виводимо повідомлення про помилку
         return prepared_users
     
+    @staticmethod
     def get_upcoming_birthday(users):
         days = 7  # Кількість днів для перевірки на наближені дні народження
         today = datetime.today().date()  # Поточна дата
-        prepared_users = parse_birthdays(users)
+        prepared_users = AddressBook.parse_birthdays(users)
         upcoming_birthdays = []
 
         for user in prepared_users:  # Ітерація по підготовленим користувачам
@@ -85,7 +87,7 @@ class AddressBook(UserDict):
 
             if 0 <= (birthday_this_year - today).days <= days:  # Якщо день народження в межах вказаного періоду
                 if birthday_this_year.weekday() >= 5:  # Якщо день народження випадає на суботу або неділю
-                    birthday_this_year = find_next_weekday(birthday_this_year, 0)  # Знаходимо наступний понеділок
+                    birthday_this_year = AddressBook.find_next_weekday(birthday_this_year, 0)  # Знаходимо наступний понеділок
 
                 congratulation_date_str = birthday_this_year.strftime('%Y.%m.%d')  # Форматуємо дату у рядок
                 upcoming_birthdays.append({  # Додаємо дані про майбутній день народження
@@ -107,6 +109,17 @@ class Record:
     def remove_phone(self, phone_number):
         # Phone('0951111111') == '0951111111'
         self.phones = [p for p in self.phones if str(p) != phone_number]
+
+    def add_birthday(self, birthday):
+        self.birthday = Birthday(birthday)
+
+    def show_birthday(self):
+        if self.birthday:
+            return f"{self.name}'s birthday is on {self.birthday}"
+        else:
+            return f"{self.name} does not have a birthday set."
+
+    
 
 @staticmethod
 def input_error(func):
@@ -167,17 +180,6 @@ def show_contact(args, address_book):
 def all_contacts(address_book):
     for record in address_book.values():
         print(record)
-
-@input_error
-def add_birthday(self, birthday):
-    self.birthday = Birthday(birthday)
-
-@input_error
-def show_birthday(self):
-    if self.birthday:
-        return f"{self.name}'s birthday is on {self.birthday}"
-    else:
-        return f"{self.name} does not have a birthday set."
 
 def birthdays(self, address_book):
     today = datetime.now().date()
