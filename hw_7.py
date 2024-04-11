@@ -189,6 +189,12 @@ def add_birthday(args, address_book):
         return "Birthday was added."
     else:
         raise KeyError
+    
+@input_error
+def show_birthday(args, book):
+    name = args[0]
+    record = book.find(name)
+    return str(record.birthday)
 
 
 
@@ -226,11 +232,11 @@ def main():
         elif command == "all": 
             all_contacts(address_book)
         elif command == "add-birthday":
-            print(Record.add_birthday(args, address_book))
+            print(add_birthday(args, address_book))
         elif command == "show-birthday":
-            print(Record.show_birthday(args, address_book))
+            print(show_birthday(args, address_book))
         elif command == "birthdays":
-            print(Record.birthdays(args, address_book))
+            print(birthdays(args, address_book))
         else:
             print("Invalid command.")
     
