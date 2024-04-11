@@ -120,8 +120,6 @@ class Record:
             return f"{self.name} does not have a birthday set."
 
     
-
-@staticmethod
 def input_error(func):
     def inner(*args, **kwargs):
         try:
@@ -137,14 +135,14 @@ def input_error(func):
             return "Enter the argument for the command."
     return inner
     
-@staticmethod
+
 def parse_input(user_input):
     cmd, *args = user_input.split()
     cmd = cmd.strip().lower()
     return cmd, *args
     
 @input_error
-def add_contact(args, address_book):
+def add_contact(args, address_book: AddressBook):
     name, phone, *_ = args
     record = address_book.find(name)
     message = "Contact updated."
@@ -157,7 +155,7 @@ def add_contact(args, address_book):
     return message
     
 @input_error
-def change_contact(args, address_book):
+def change_contact(args, address_book: AddressBook):
     name, phone = args
     record = address_book.find(name)
     if record:
@@ -168,7 +166,7 @@ def change_contact(args, address_book):
         raise ValueError("Contact does not exist.")
     
 @input_error
-def show_contact(args, address_book):
+def show_contact(args, address_book: AddressBook):
     name = args[0]
     record = address_book.find(name)
     if record:
@@ -177,11 +175,24 @@ def show_contact(args, address_book):
         raise KeyError("Contact not found.")
 
 @input_error    
-def all_contacts(address_book):
+def all_contacts(address_book: AddressBook):
     for record in address_book.values():
         print(record)
 
-def birthdays(self, address_book):
+@input_error
+def add_birthday(args, address_book):
+    name = args[0]
+    birthday = args[1]
+    record = address_book.find(name)
+    if record:
+        record.add_birthday(birthday)
+        return "Birthday was added."
+    else:
+        raise KeyError
+
+
+
+def birthdays(args, address_book):
     today = datetime.now().date()
     next_week = today + timedelta(days=7)
     birthdays_next_week = []
@@ -199,7 +210,7 @@ def main():
     print("Welcome to the assistant bot!")
     while True:
         user_input = input("Enter a command: ")
-        command, *args = Record.parse_input(user_input)
+        command, *args = parse_input(user_input)
 
         if command in ["close", "exit"]:
             print("Good bye!")
@@ -207,13 +218,13 @@ def main():
         elif command == "hello":
             print("How can I help you?")
         elif command == "add":
-            print(Record.add_contact(args, address_book))
+            print(add_contact(args, address_book))
         elif command == "change":
-            print(Record.change_contact(args, address_book))
+            print(change_contact(args, address_book))
         elif command == "show":
-            print(Record.show_contact(args, address_book))   
+            print(show_contact(args, address_book))   
         elif command == "all": 
-            Record.all_contacts(address_book)
+            all_contacts(address_book)
         elif command == "add-birthday":
             print(Record.add_birthday(args, address_book))
         elif command == "show-birthday":
