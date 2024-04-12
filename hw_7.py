@@ -118,6 +118,10 @@ class Record:
             return f"{self.name}'s birthday is on {self.birthday}"
         else:
             return f"{self.name} does not have a birthday set."
+        
+    def __str__(self):
+        phones_str = '; '.join(str(phone) for phone in self.phones)
+        return f"Contact name: {self.name.value}, phones: {phones_str}"
 
     
 def input_error(func):
@@ -178,6 +182,7 @@ def show_contact(args, address_book: AddressBook):
 def all_contacts(address_book: AddressBook):
     for record in address_book.values():
         print(record)
+    return record
 
 @input_error
 def add_birthday(args, address_book):
@@ -230,7 +235,7 @@ def main():
         elif command == "show":
             print(show_contact(args, address_book))   
         elif command == "all": 
-            all_contacts(address_book)
+            print(all_contacts(address_book))
         elif command == "add-birthday":
             print(add_birthday(args, address_book))
         elif command == "show-birthday":
@@ -247,12 +252,3 @@ if __name__ == "__main__":
 def __str__(self):
     return f"Contact name: {self.name.value}, phones: {'; '.join(str(p) for p in self.phones)}"
     
-   
-
-
-
-    
-    
-    
-    
-
